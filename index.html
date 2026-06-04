@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>新榕安岚 169㎡ VR看房H5</title>
+    <link rel="stylesheet" href="./style.css?v=20260604-share-webp-1">
+  </head>
+  <body>
+    <main class="app">
+      <section class="hero" aria-label="VR看房主视图">
+        <div class="hero__chrome">
+          <div>
+            <p class="kicker">新榕安岚 · 改善样板动线</p>
+            <h1 id="spaceTitle">南向会客厅</h1>
+          </div>
+          <button class="tool-button" id="fullscreenButton" type="button" aria-label="全屏看房">⛶</button>
+        </div>
+
+        <div class="vr-stage" id="vrStage" aria-label="当前空间VR视觉模拟">
+          <div class="vr-stage__ceiling"></div>
+          <div class="vr-stage__view"></div>
+          <div class="vr-stage__floor"></div>
+          <div class="vr-stage__objects" id="sceneObjects"></div>
+          <div class="drag-hint" id="dragHint">左右拖动看空间</div>
+        </div>
+
+        <div class="hero__info">
+          <div class="narrative">
+            <span id="spaceMeta">约 6.3m 南向面宽</span>
+            <p id="spaceCopy">客厅、餐厅与南向阳台连续展开，形成大尺度会客界面。</p>
+          </div>
+          <div class="space-tabs" id="spaceTabs" aria-label="空间切换"></div>
+        </div>
+      </section>
+
+      <section class="floorplan" aria-label="户型图与参观动线">
+        <header class="panel-head">
+          <div>
+            <p class="kicker">Floor Plan</p>
+            <h2 id="planTitle">7#8# - 169㎡精装改造方案</h2>
+          </div>
+          <div class="area-mark" id="areaMark">169㎡</div>
+        </header>
+
+        <div class="plan-card">
+          <img id="planImage" src="./assets/floorplan-6.png" alt="7#8# 169㎡精装改造方案户型图">
+          <div class="plan-hotspots" id="planHotspots"></div>
+        </div>
+
+        <div class="route">
+          <div class="route__line" aria-hidden="true"></div>
+          <div class="route__steps" id="routeSteps" aria-label="看房动线"></div>
+        </div>
+
+        <div class="selling-points" id="sellingPoints" aria-label="户型亮点"></div>
+
+        <div class="plan-switcher" id="planSwitcher" aria-label="其它户型图切换"></div>
+      </section>
+    </main>
+
+    <script src="./app.js?v=20260604-share-webp-1"></script>
+  </body>
+</html>
