@@ -118,11 +118,13 @@ h2 {
   inset: 0;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;
   background-color: #182226;
   background-image: var(--rendering);
   background-position: 50% 50%;
-  background-size: cover;
-  transition: background-image 320ms ease;
+  background-repeat: repeat-x;
+  background-size: auto 108%;
+  transition: background-image 320ms ease, background-position 120ms linear;
 }
 
 .vr-stage:active {
@@ -144,6 +146,20 @@ h2 {
 .vr-stage.is-rendered .vr-stage__floor,
 .vr-stage.is-rendered .vr-stage__objects {
   display: none;
+}
+
+.vr-stage.is-pano::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: max(86px, 12vh);
+  z-index: 1;
+  width: min(430px, 70vw);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(255, 224, 164, 0.58), transparent);
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .vr-stage__ceiling {
@@ -191,6 +207,77 @@ h2 {
   pointer-events: none;
 }
 
+.vr-nodes {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.room-node {
+  position: absolute;
+  min-height: 40px;
+  max-width: min(190px, 44vw);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transform: translate(-50%, -50%);
+  padding: 7px 10px 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(13, 17, 18, 0.54);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(14px);
+}
+
+.room-node::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 1px;
+  height: 14px;
+  background: linear-gradient(rgba(255, 255, 255, 0.65), transparent);
+}
+
+.room-node__dot {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #1d1a16;
+  background: #ffe0a4;
+  box-shadow: 0 0 0 6px rgba(255, 224, 164, 0.18);
+}
+
+.room-node__dot::before {
+  content: "›";
+  margin-top: -1px;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.room-node span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.room-node:hover,
+.room-node:focus-visible {
+  border-color: #ffe0a4;
+  background: rgba(22, 28, 29, 0.72);
+  outline: none;
+}
+
 .object {
   position: absolute;
   border-radius: var(--radius, 8px);
@@ -204,10 +291,9 @@ h2 {
 
 .drag-hint {
   position: absolute;
-  left: 50%;
-  bottom: 30%;
-  z-index: 2;
-  transform: translateX(-50%);
+  left: clamp(16px, 4vw, 56px);
+  top: max(150px, 17vh);
+  z-index: 4;
   padding: 8px 12px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 8px;
@@ -577,6 +663,31 @@ h2 {
 
   .narrative p {
     font-size: 15px;
+  }
+
+  .drag-hint {
+    left: 14px;
+    top: 142px;
+  }
+
+  .vr-stage {
+    background-size: auto 100%;
+  }
+
+  .room-node {
+    min-height: 36px;
+    max-width: 42vw;
+    padding: 6px 9px 6px 7px;
+    gap: 7px;
+  }
+
+  .room-node__dot {
+    width: 20px;
+    height: 20px;
+  }
+
+  .room-node span:last-child {
+    font-size: 12px;
   }
 
   .space-tabs {
