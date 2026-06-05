@@ -1,4 +1,4 @@
-const ASSET_VERSION = "20260605-pano-nodes-1";
+const ASSET_VERSION = "20260604-share-webp-1";
 
 const plans = [
   {
@@ -162,40 +162,10 @@ const spaces = [
   }
 ];
 
-const roomLinks = {
-  entry: [
-    { to: "dining", label: "去餐厨", x: 64, y: 57 },
-    { to: "living", label: "去客厅", x: 38, y: 55 }
-  ],
-  dining: [
-    { to: "entry", label: "回入户", x: 20, y: 58 },
-    { to: "living", label: "去客厅", x: 43, y: 60 },
-    { to: "balcony", label: "去阳台", x: 76, y: 50 }
-  ],
-  living: [
-    { to: "dining", label: "去餐厨", x: 20, y: 52 },
-    { to: "balcony", label: "去阳台", x: 70, y: 48 },
-    { to: "primary", label: "去主卧", x: 75, y: 63 },
-    { to: "southBedroom", label: "去次卧", x: 53, y: 66 }
-  ],
-  balcony: [
-    { to: "living", label: "回客厅", x: 28, y: 56 },
-    { to: "primary", label: "去主卧", x: 68, y: 54 }
-  ],
-  primary: [
-    { to: "living", label: "回客厅", x: 18, y: 60 },
-    { to: "balcony", label: "去阳台", x: 62, y: 47 }
-  ],
-  southBedroom: [
-    { to: "living", label: "回客厅", x: 18, y: 56 },
-    { to: "balcony", label: "去阳台", x: 70, y: 52 }
-  ]
-};
-
 const points = [
   ["按户型定风格", "9个户型分别匹配原木、奶油、意式、东方、法式等流行设计。"],
-  ["360°节点看房", "房间内设置可点击穿行节点，按入户、餐厨、客厅、阳台、卧室动线串联。"],
-  ["真实户型导入", "效果图与原户型图、热点和动线绑定，切换户型即可同步环视。"]
+  ["全户型细看房", "9个户型均配置入户、客餐厨、阳台、主卧、次卧空间图。"],
+  ["真实户型导入", "效果图与原户型图、热点和动线绑定，切换户型即可同步预览。"]
 ];
 
 const els = {
@@ -205,7 +175,6 @@ const els = {
   vr: document.getElementById("vrStage"),
   hint: document.getElementById("dragHint"),
   objects: document.getElementById("sceneObjects"),
-  nodes: document.getElementById("vrNodes"),
   tabs: document.getElementById("spaceTabs"),
   hotspots: document.getElementById("planHotspots"),
   route: document.getElementById("routeSteps"),
@@ -231,47 +200,12 @@ function versioned(src) {
 
 function setHeroImage(src) {
   els.vr.style.setProperty("--rendering", `url("${versioned(src)}")`);
-  els.vr.classList.add("is-rendered", "is-pano");
+  els.vr.classList.add("is-rendered");
   els.objects.innerHTML = "";
 }
 
 function getRoomRendering(space) {
   return `./assets/room-renderings/plan-${activePlan.page}/${space.room}.webp`;
-}
-
-function normalizePan(value) {
-  return ((value % 100) + 100) % 100;
-}
-
-function setPan(nextPosition, shouldRenderNodes = true) {
-  position = nextPosition;
-  els.vr.style.backgroundPosition = `${position}% 50%`;
-  if (shouldRenderNodes) renderSceneNodes();
-}
-
-function renderSceneNodes() {
-  if (!els.nodes || usePlanRendering) {
-    if (els.nodes) els.nodes.innerHTML = "";
-    return;
-  }
-
-  const links = roomLinks[activeSpace.id] || [];
-  const pan = normalizePan(position);
-  const shift = (50 - pan) * 0.34;
-
-  els.nodes.innerHTML = links.map((link) => {
-    const target = spaces.find((space) => space.id === link.to);
-    if (!target) return "";
-
-    let x = link.x + shift;
-    while (x < 14) x += 72;
-    while (x > 86) x -= 72;
-
-    return `<button class="room-node" type="button" data-target-space="${link.to}" style="left:${x}%;top:${link.y}%;" aria-label="${link.label}">
-      <span class="room-node__dot" aria-hidden="true"></span>
-      <span>${link.label}</span>
-    </button>`;
-  }).join("");
 }
 
 function renderSpaces() {
@@ -315,12 +249,10 @@ function setSpace(id) {
   activeSpace = next;
   usePlanRendering = false;
   els.title.textContent = next.title;
-  els.meta.textContent = `${activePlan.area} ${activePlan.style} · ${next.meta}`;
+  els.meta.textContent = next.meta;
   els.copy.textContent = next.copy;
-  setPan(50, false);
   setHeroImage(getRoomRendering(next));
   renderSpaces();
-  renderSceneNodes();
 }
 
 function setPlan(page) {
@@ -328,34 +260,26 @@ function setPlan(page) {
   if (!next) return;
 
   activePlan = next;
-  usePlanRendering = false;
+  usePlanRendering = true;
   els.planTitle.textContent = next.title;
   els.area.textContent = next.area;
   els.planImage.src = versioned(next.img);
   els.planImage.alt = `${next.title}户型图`;
+  els.title.textContent = next.style;
+  els.meta.textContent = `${next.area} · ${next.type}`;
+  els.copy.textContent = next.brief;
+  setHeroImage(next.rendering);
   renderPlanSwitcher();
-  setSpace(activeSpace.id);
+  renderSpaces();
 }
 
 document.addEventListener("click", (event) => {
-  const nodeButton = event.target.closest("[data-target-space]");
-  if (nodeButton) {
-    setSpace(nodeButton.dataset.targetSpace);
-    return;
-  }
-
   const spaceButton = event.target.closest("[data-space]");
   if (spaceButton) setSpace(spaceButton.dataset.space);
 
   const planButton = event.target.closest("[data-plan]");
   if (planButton) setPlan(planButton.dataset.plan);
 });
-
-if (els.nodes) {
-  els.nodes.addEventListener("pointerdown", (event) => {
-    event.stopPropagation();
-  });
-}
 
 els.fullscreen.addEventListener("click", () => {
   if (document.fullscreenElement) {
@@ -376,7 +300,8 @@ els.vr.addEventListener("pointerdown", (event) => {
 els.vr.addEventListener("pointermove", (event) => {
   if (!dragging) return;
   const delta = event.clientX - startX;
-  setPan(startPosition + delta / 7);
+  position = Math.max(0, Math.min(100, startPosition + delta / 7));
+  els.vr.style.backgroundPosition = `${position}% 50%`;
 });
 
 els.vr.addEventListener("pointerup", (event) => {
@@ -384,10 +309,6 @@ els.vr.addEventListener("pointerup", (event) => {
   if (els.vr.hasPointerCapture(event.pointerId)) {
     els.vr.releasePointerCapture(event.pointerId);
   }
-});
-
-els.vr.addEventListener("pointercancel", () => {
-  dragging = false;
 });
 
 renderPoints();
